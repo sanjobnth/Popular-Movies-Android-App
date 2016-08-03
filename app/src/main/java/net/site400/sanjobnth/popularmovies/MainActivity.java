@@ -2,6 +2,7 @@ package net.site400.sanjobnth.popularmovies;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,5 +17,11 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.container, new MainActivityFragment())
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 }
