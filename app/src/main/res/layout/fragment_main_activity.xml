@@ -9,5 +9,4 @@
     android:stretchMode="columnWidth"
     tools:context="net.site400.sanjobnth.popularmovies.MainActivityFragment"
 
-    android:id="@+id/movies_grid"
-    android:text="@string/hello_blank_fragment"/>
+    android:id="@+id/movies_grid" />
