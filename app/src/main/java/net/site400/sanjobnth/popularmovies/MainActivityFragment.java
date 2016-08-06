@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -26,24 +25,7 @@ public class MainActivityFragment extends Fragment {
 
     protected MovieAdapter movieAdapter;
     private ArrayList<Movie> movieList;
-
-    private Movie[] movies = {
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png"),
-            new Movie("http://i.imgur.com/DvpvklR.png")
-    };
+    private Boolean isCreatedFirstTime = true;
 
     public MainActivityFragment() {
         // Required empty public constructor
@@ -53,12 +35,20 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(savedInstanceState == null || !savedInstanceState.containsKey("movies")){
-            movieList = new ArrayList<> (Arrays.asList(movies));
+            movieList = new ArrayList<>();//(Arrays.asList(movies));
         }
         else{
             movieList = savedInstanceState.getParcelableArrayList("movies");
+            isCreatedFirstTime = false;
         }
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(isCreatedFirstTime)
+            updatePopularMovies();
     }
 
     @Override
