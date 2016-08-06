@@ -18,7 +18,7 @@ import java.net.URL;
 /**
  * Created by SANJOY on 8/6/2016.
  */
-public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, String[]> {
+public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, Movie[]> {
     private MainActivityFragment mainActivityFragment;
     private final String LOG_TAG = UpdatePopularMoviesTask.class.getSimpleName();
 
@@ -26,21 +26,38 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, String[]> {
         this.mainActivityFragment = mainActivityFragment;
     }
 
-    private String[] getPopularMoviesDataFromJSON(String jsonData) throws JSONException {
+    private Movie[] getPopularMoviesDataFromJSON(String jsonData) throws JSONException {
 
+        final String POSTER_PATH = "poster_path";
+        final String ORIGINAL_TITLE = "original_title";
+        final String OVERVIEW = "overview";
+        final String RELEASE_DATE = "release_date";
+        final String VOTE_AVERAGE = "vote_average";
+        final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
         JSONObject moviesJSON = new JSONObject(jsonData);
         JSONArray movies = moviesJSON.getJSONArray("results");
-        String[] relativePathPosters = new String[movies.length()];
+        //String relativePathPosters = new String[movies.length()];
+        Movie[] moviesArray = new Movie[movies.length()];
+        JSONObject movieJSON;
         for (int i = 0; i < movies.length(); i++) {
-            relativePathPosters[i] = movies.getJSONObject(i).getString("poster_path");
+            //relativePathPosters[i] = movies.getJSONObject(i).getString(POSTER_PATH);
+            movieJSON = movies.getJSONObject(i);
+            moviesArray[i] = new Movie(
+                    BASE_URL + movieJSON.getString(POSTER_PATH),
+                    movieJSON.getString(ORIGINAL_TITLE),
+                    movieJSON.getString(OVERVIEW),
+                    movieJSON.getDouble(VOTE_AVERAGE),
+                    movieJSON.getString(RELEASE_DATE)
+            );
         }
-        return relativePathPosters;
+        return moviesArray;
     }
 
 
     @Override
-    protected String[] doInBackground(Void... voids) {
+    protected Movie[] doInBackground(Void... voids) {
 
+        final String API_KEY = "api_key";
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -50,7 +67,7 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, String[]> {
 
         try {
             Uri builtUri = Uri.parse("http://api.themoviedb.org/3/movie/popular?").buildUpon()
-                    .appendQueryParameter("api_key", BuildConfig.MY_THEMOVIEDB_API_KEY)
+                    .appendQueryParameter(API_KEY, BuildConfig.MY_THEMOVIEDB_API_KEY)
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -109,15 +126,12 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, String[]> {
     }
 
     @Override
-    protected void onPostExecute(String[] posters) {
-        String baseURL = "http://image.tmdb.org/t/p/w185/";
-        if (posters != null) {
+    protected void onPostExecute(Movie[] movies) {
+        if (movies != null) {
             mainActivityFragment.movieAdapter.clear();
-            for (String poster : posters) {
-                Log.v(LOG_TAG, baseURL + poster);
-                mainActivityFragment.movieAdapter.add(
-                        new Movie(baseURL + poster)
-                );
+            for (Movie movie : movies) {
+                Log.v(LOG_TAG, movie.posterUrl);
+                mainActivityFragment.movieAdapter.add(movie);
             }
         }
     }
