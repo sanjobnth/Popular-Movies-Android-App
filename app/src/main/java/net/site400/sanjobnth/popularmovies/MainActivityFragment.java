@@ -37,6 +37,8 @@ public class MainActivityFragment extends Fragment {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private MovieAdapter movieAdapter;
+    private ArrayList<Movie> movieList;
+
     private Movie[] movies = {
             new Movie("http://i.imgur.com/DvpvklR.png"),
             new Movie("http://i.imgur.com/DvpvklR.png"),
@@ -62,6 +64,12 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState == null || !savedInstanceState.containsKey("movies")){
+            movieList = new ArrayList<Movie> (Arrays.asList(movies));
+        }
+        else{
+            movieList = savedInstanceState.getParcelableArrayList("movies");
+        }
         setHasOptionsMenu(true);
     }
 
@@ -83,11 +91,17 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movies", movieList);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_main_activity, container, false);
-        movieAdapter = new MovieAdapter(getActivity(), new ArrayList<> (Arrays.asList(movies)));
+        movieAdapter = new MovieAdapter(getActivity(), movieList);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
         gridView.setAdapter(movieAdapter);
