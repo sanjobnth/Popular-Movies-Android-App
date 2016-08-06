@@ -15,12 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -82,7 +87,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_main_activity, container, false);
-        movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies));
+        movieAdapter = new MovieAdapter(getActivity(), new ArrayList<> (Arrays.asList(movies)));
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
         gridView.setAdapter(movieAdapter);
@@ -95,12 +100,23 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-    public class UpdatePopularMoviesTask extends AsyncTask <Void, Void, Void> {
+    public class UpdatePopularMoviesTask extends AsyncTask <Void, Void, String[]> {
         private final String LOG_TAG = UpdatePopularMoviesTask.class.getSimpleName();
+
+        private String[] getPopularMoviesDataFromJSON(String jsonData) throws JSONException{
+
+            JSONObject moviesJSON = new JSONObject(jsonData);
+            JSONArray movies = moviesJSON.getJSONArray("results");
+            String[] relativePathPosters = new String[movies.length()];
+            for (int i = 0; i < movies.length(); i++) {
+                relativePathPosters[i] = movies.getJSONObject(i).getString("poster_path");
+            }
+            return relativePathPosters;
+        }
 
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected String[] doInBackground(Void... voids) {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -142,7 +158,6 @@ public class MainActivityFragment extends Fragment {
                     return null;
                 }
                 popularMoviesJsonStr = buffer.toString();
-                Log.v(LOG_TAG, popularMoviesJsonStr);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -160,7 +175,28 @@ public class MainActivityFragment extends Fragment {
                     }
                 }
             }
+
+            try {
+               return getPopularMoviesDataFromJSON(popularMoviesJsonStr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] posters) {
+            String baseURL = "http://image.tmdb.org/t/p/w185/";
+            if(posters != null){
+                movieAdapter.clear();
+                for(String poster: posters){
+                    Log.v(LOG_TAG, baseURL + poster);
+                    movieAdapter.add(
+                            new Movie(baseURL + poster)
+                    );
+                }
+            }
         }
     }
 
