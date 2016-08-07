@@ -130,7 +130,6 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         if (movies != null) {
             mainActivityFragment.movieAdapter.clear();
             for (Movie movie : movies) {
-                Log.v(LOG_TAG, movie.posterUrl);
                 mainActivityFragment.movieAdapter.add(movie);
             }
         }
