@@ -1,6 +1,7 @@
 package net.site400.sanjobnth.popularmovies;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -90,6 +91,9 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movie = movieAdapter.getItem(i);
                 Log.v(LOG_TAG, movie.orgTitle + " " + movie.releaseDate);
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, movie.posterUrl);
+                startActivity(intent);
             }
         });
 
