@@ -91,8 +91,8 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movie = movieAdapter.getItem(i);
                 Log.v(LOG_TAG, movie.orgTitle + " " + movie.releaseDate);
-                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, movie.posterUrl);
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class).putExtra(Intent.EXTRA_TEXT, movie);
+                       // .putExtra(Intent.EXTRA_TEXT, movie.posterUrl);
                 startActivity(intent);
             }
         });
