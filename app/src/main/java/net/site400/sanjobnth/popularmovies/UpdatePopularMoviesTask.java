@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Created by SANJOY on 8/6/2016.
@@ -60,6 +62,7 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         final String API_KEY = "api_key";
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
+        final String orderBy = mainActivityFragment.getString(R.string.sort_by_rating);
 
         // Will contain the raw JSON response as a string.
         String popularMoviesJsonStr = null;
@@ -117,7 +120,18 @@ public class UpdatePopularMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         }
 
         try {
-            return getPopularMoviesDataFromJSON(popularMoviesJsonStr);
+            Movie[] movies = getPopularMoviesDataFromJSON(popularMoviesJsonStr);
+
+            Arrays.sort(movies, new Comparator<Movie>() {
+                @Override
+                public int compare(Movie movie1, Movie movie2) {
+                    if(orderBy.equals(mainActivityFragment.getString(R.string.sort_by_rating))) {
+                        return movie2.rating - movie1.rating > 0 ? 1 : -1;
+                    }
+                    return 0;
+                }
+            });
+            return movies;
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
